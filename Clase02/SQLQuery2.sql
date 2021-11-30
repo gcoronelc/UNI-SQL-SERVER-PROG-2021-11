@@ -15,6 +15,9 @@ GO
 SELECT dbo.fnSuma( 24, 56 ) as suma; 
 GO
 
+select ROUND(6.56783,2) dato;
+go
+
 
 
 
