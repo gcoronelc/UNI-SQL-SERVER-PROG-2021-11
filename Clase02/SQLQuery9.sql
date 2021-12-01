@@ -2,7 +2,13 @@ USE EDUCA;
 GO 
 
 
-
+ALTER PROCEDURE [dbo].[usp_precio] ( @p_idcurso int, @p_precio money OUT ) 
+AS 
+BEGIN 
+  SELECT @p_precio = cur_precio 
+  FROM dbo.CURSO 
+  WHERE cur_id = @p_idcurso; 
+END;
  
 BEGIN 
   DECLARE @precio money; 
@@ -10,4 +16,3 @@ BEGIN
   PRINT CONCAT( 'PRECIO: ', @precio ); 
 END; 
 GO
-
