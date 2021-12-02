@@ -11,7 +11,7 @@ CODIGO    NOMBRE         MATRICULADOS    PROYECTADO    RECAUDADO     FALTA COBRA
 --------------------------------------------------------------------------------------
 */
 
-CREATE PROCEDURE USP_RESUMEN_ECONOMICO
+ALTER PROCEDURE USP_RESUMEN_ECONOMICO
 AS
 BEGIN
 	-- Definir la tabla
@@ -28,8 +28,23 @@ BEGIN
 	insert into @resumen 
 	select cur_id, cur_nombre, cur_matriculados, 0, 0, 0 
 	from curso;
-	
-
+	-- Columna PROYECTADO
+	update @resumen 
+	set proyectado = (select sum(mat_precio) 
+			from matricula m
+			where m.cur_id = t.cur_id)
+	from @resumen t
+	where cur_id in (select distinct cur_id from matricula);
+	-- Columna RECAUDADO
+	update @resumen 
+	set recaudado = (select sum(pag_importe) 
+			from pago p
+			where p.cur_id = t.cur_id)
+	from @resumen t
+	where cur_id in (select distinct cur_id from pago);
+	-- Columna FALTA_COBRAR
+	update @resumen 
+	set FALTA_COBRARR = PROYECTADO - RECAUDADO;
 	-- Consulta final
 	select * from @resumen;
 END;
@@ -39,5 +54,5 @@ GO
 exec USP_RESUMEN_ECONOMICO;
 go
 
-
+select * from matricula;
 
