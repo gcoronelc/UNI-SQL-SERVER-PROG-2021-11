@@ -1,4 +1,9 @@
 /*
+ * La auditoria es a la tabla ARTICULO, columna PRECIO.
+ * Se utiliza el loginid con el cual el usuario inicia sesión.
+*/
+
+/*
  * BASE DE DATOS: CASO01
 */
 
@@ -19,6 +24,9 @@ go
 insert into articulo values( 'Pantalon', 100.00 );
 insert into articulo values( 'Camisa', 130.00 );
 insert into articulo values( 'Zapatillas futbol', 240.00 );
+go
+
+select * from articulo;
 go
 
 
@@ -49,22 +57,24 @@ as
 begin
 	DECLARE @login_name VARCHAR(128);
 
-    SELECT  @login_name = login_name
-    FROM    sys.dm_exec_sessions
-    WHERE   session_id = @@SPID;
+	SELECT  @login_name = login_name
+	FROM    sys.dm_exec_sessions
+	WHERE   session_id = @@SPID;
 
 	IF NOT EXISTS ( SELECT 1 FROM Deleted )
 	begin
 		INSERT  INTO dbo.ARTICULO_AUD_PRECIO(accion,idarticulo,precio_new,fecha,usuario)
 		SELECT 'INSERT', I.idarticulo, I.precio, GETDATE(), @login_name FROM Inserted I
-		return;
+		return; -- Finaliza el trigger
 	end;
+
 	IF NOT EXISTS ( SELECT 1 FROM Inserted )
 	begin
 		INSERT  INTO dbo.ARTICULO_AUD_PRECIO(accion,idarticulo,precio_old,fecha,usuario)
 		SELECT 'DELETE', D.idarticulo, D.precio, GETDATE(), @login_name FROM Deleted D
 		return;
 	end;
+
 	if( UPDATE(precio) )
 	begin
 		INSERT  INTO dbo.ARTICULO_AUD_PRECIO(accion,idarticulo,precio_old,precio_new,fecha,usuario)
@@ -77,20 +87,27 @@ go
 
 
 /*
- * Pruebas
+ * Prueba: INSERT
 */
 
 insert into articulo values( 'Polo deportivo', 80.00 );
 go
 
+select * from articulo;
 select * from ARTICULO_AUD_PRECIO;
 go
+
+
+/*
+ * Prueba: UPDATE
+*/
 
 update articulo 
 set nombre='Polo deportivo color blanco'
 where idarticulo = 4;
 go
 
+select * from articulo;
 select * from ARTICULO_AUD_PRECIO;
 go
 
@@ -99,27 +116,34 @@ set precio=95.0
 where idarticulo = 4;
 go
 
+select * from articulo;
 select * from ARTICULO_AUD_PRECIO;
 go
+
+
+/*
+ * Prueba: DELETE
+*/
 
 delete from articulo
 where idarticulo = 4;
 
+select * from articulo;
 select * from ARTICULO_AUD_PRECIO;
 go
 
+
+/*
+ * Prueba: Actualización masiva
+*/
 
 update articulo 
 set precio = precio * 1.20;
 go
 
+select * from articulo;
 select * from ARTICULO_AUD_PRECIO;
 go
-
-
-
-
-
 
 
 
