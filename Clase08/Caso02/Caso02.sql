@@ -1,4 +1,9 @@
 /*
+ * En este caso, el objetivo es tambien auditar el PRECIO
+ * de la tabla ARTICULO.
+*/
+
+/*
  * BASE DE DATOS: CASO02
 */
 
@@ -69,7 +74,7 @@ begin
 	IF NOT EXISTS ( SELECT 1 FROM Inserted )
 	begin
 		INSERT  INTO dbo.ARTICULO_AUD_PRECIO(fecha_reg,accion,idarticulo,precio_old,loginid,fecha_aud,usuario_aud)
-		SELECT GETDATE(),'DELETE',D.idarticulo,D.precio,@login_name,GETDATE(),@login_name   FROM Deleted D
+		SELECT GETDATE(),'DELETE',D.idarticulo,D.precio,@login_name,GETDATE(),@login_name FROM Deleted D
 		return;
 	end;
 	if( UPDATE(precio) )
@@ -84,7 +89,7 @@ go
 
 
 /*
- * Pruebas
+ * Prueba: INSERT
 */
 
 insert into articulo values( 'Polo deportivo', 80.00, '20210910', 'user02' );
@@ -93,6 +98,11 @@ go
 select * from articulo;
 select * from ARTICULO_AUD_PRECIO;
 go
+
+
+/*
+ * Prueba: UPDATE
+*/
 
 update articulo 
 set nombre='Polo deportivo color blanco', fecha_aud='20211105', usuario_aud='user06'
@@ -112,6 +122,11 @@ select * from articulo;
 select * from ARTICULO_AUD_PRECIO;
 go
 
+
+/*
+ * Prueba: DELETE
+*/
+
 delete from articulo
 where idarticulo = 4;
 
@@ -120,6 +135,10 @@ select * from ARTICULO_AUD_PRECIO;
 go
 
 
+/*
+ * Actualización masiva
+*/
+
 update articulo 
 set precio = precio * 1.20, fecha_aud=GETDATE(), usuario_aud='user09';
 go
@@ -127,6 +146,8 @@ go
 select * from articulo;
 select * from ARTICULO_AUD_PRECIO;
 go
+
+
 
 
 
