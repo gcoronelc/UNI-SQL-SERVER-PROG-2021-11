@@ -1,0 +1,10 @@
+﻿
+
+Registras Venta -> Actualiza las Guias
+
+Registro de movimiento de inventario -> Actualiza el Stock
+
+Registrar Venta -> Actualizar numeración
+
+
+
